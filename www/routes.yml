@@ -6,10 +6,10 @@
   controller: Page
   action: show
 
-
-/sinscrire:
+/register:
   controller: User
   action: register
+  methods: [GET, POST]
 
 /login:
   controller: User
