@@ -6,6 +6,14 @@
     <title>Inscription</title>
 </head>
 <body>
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+    </ul>
+</nav>
+
     <h1>Créer un compte</h1>
     <form action="/register" method="POST">
         <label for="email">Email:</label>
@@ -30,13 +38,15 @@
     </form>
 
     <?php
-    // Script php pour afficher les erreurs de validation
+    // Afficher les erreurs si présents
     if (isset($errors)) {
         foreach ($errors as $error) {
             echo "<p style='color: red;'>$error</p>";
         }
     }
     ?>
+
+
 
 </body>
 </html>

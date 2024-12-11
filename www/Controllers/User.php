@@ -6,10 +6,7 @@ use App\Core\View;
 
 class User
 {
-    public function register(): void
-    {
-        $view = new View("User/register.php", "front.php");
-
+    public function register(): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Cette partie sert à récupérer les données du formulaire
             $email = trim($_POST['email']);
@@ -18,7 +15,7 @@ class User
             $firstname = trim($_POST['firstname']);
             $lastname = trim($_POST['lastname']);
             $country = trim($_POST['country']);
-            
+    
             // On créer un tableau pour stocker les erreurs
             $errors = [];
     
@@ -26,7 +23,7 @@ class User
             if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "L'email est invalide.";
             }
-            
+    
             if (empty($password) || strlen($password) < 6) {
                 $errors[] = "Votre mot de passe doit contenir au moins 6 caractères.";
             }
@@ -56,9 +53,9 @@ class User
                 $errors[] = "L'email est déjà utilisé.";
             }
     
-            // Et Si il y a des erreurs, on retourne à la page d'inscription
+            // Et Si il y a des erreurs, on reste sur la page d'inscription
             if (!empty($errors)) {
-                header("Location: /register");
+                include_once __DIR__ . '/../Views/User/register.php';
                 return;
             }
     
@@ -76,23 +73,73 @@ class User
             header("Location: /login");
             exit;
         }
-
+    
+        // Si la méthode n'est pas POST, afficher le formulaire d'inscription sans erreurs
+        include_once __DIR__ . '/../Views/User/register.php';
     }
+    
     
 
     public function login(): void
     {
-        $view = new View("User/login", "front.php");
-        //echo $view;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Récupération des données du formulaire
+            $email = trim($_POST['email']);
+            $password = $_POST['password'];
+    
+            // Tableau pour les erreurs
+            $errors = [];
+    
+            // Validation des champs
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = "L'email est invalide.";
+            }
+    
+            if (empty($password)) {
+                $errors[] = "Le mot de passe est requis.";
+            }
+    
+            // Vérification des identifiants si pas d'erreurs
+            if (empty($errors)) {
+                $db = new \PDO('sqlite:' . __DIR__ . '/../db/database.sqlite');
+                $stmt = $db->prepare("SELECT * FROM user WHERE email = :email");
+                $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
+                $stmt->execute();
+                $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+    
+                if ($user && password_verify($password, $user['password'])) {
+                    // Stockage des informations utilisateur dans la session
+                    session_start();
+                    $_SESSION['user'] = [
+                        'id' => $user['id'],
+                        'firstname' => $user['firstname']
+                    ];
+    
+                    // Redirection vers la page d'accueil
+                    header("Location: /");
+                    exit;
+                } else {
+                    $errors[] = "Email ou mot de passe incorrect.";
+                }
+            }
+    
+            // Affiche à nouveau la page login avec les erreurs
+            include_once __DIR__ . '/../Views/User/login.php';
+            return;
+        }
+    
+        // Affiche la vue de connexion
+        include_once __DIR__ . '/../Views/User/login.php';
     }
-
-
+    
     public function logout(): void
     {
-        $user = new U;
-        $user->logout();
-        //header("Location: /");
+        session_start();
+        session_destroy();
+        header("Location: /login");
+        exit;
     }
+    
 
 
 

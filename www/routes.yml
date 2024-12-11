@@ -14,10 +14,12 @@
 /login:
   controller: User
   action: login
+  methods: [GET, POST]
 
 /logout:
   controller: User
   action: logout
+  methods: [GET]
 
 /dashboard:
   controller: Backoffice
